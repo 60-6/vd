@@ -30,7 +30,7 @@ int main(int, char** argv)
     if (!argv[1])
     {
         cout << red << "⚠ you didn't specify a directory\n\n" << reset;
-        return 0;
+        return 1;
     }
 
     path target = argv[1];
@@ -38,7 +38,7 @@ int main(int, char** argv)
     if (!is_directory(target))
     {
         cout << red << "⚠ invalid directory\n\n" << reset;
-        return 0;
+        return 1;
     }
 
 // ├───── header ───────────────────────────────────────────────────────────┤
