@@ -22,10 +22,10 @@ void windowsnonsense() {
 
 int main(int, char** argv)
 {
-    cout << "\n";
+    cout << '\n';
     windowsnonsense();
 
-// ┌───── validation ───────────────────────────────────────────────────────┐
+// ┌───── validation ────────────────────────────────────────────────────────────────┐
 
     if (!argv[1])
     {
@@ -41,21 +41,17 @@ int main(int, char** argv)
         return 1;
     }
 
-// ├───── header ───────────────────────────────────────────────────────────┤
+// ├───── header ────────────────────────────────────────────────────────────────────┤
 
-    string name = target.filename().string();
-    if (name.empty()) name = "root";
-    int count = getcount(target);
+    cout << bold << target.string() << " (" << getcount(target) << ")\n" << reset;
 
-    cout << bold << name << " (" << count << ")\n" << reset;
-
-// ├───── recursion ────────────────────────────────────────────────────────┤
+// ├───── recursion ─────────────────────────────────────────────────────────────────┤
 
     recurse(target);
 
-// └────────────────────────────────────────────────────────────────────────┘
+// └─────────────────────────────────────────────────────────────────────────────────┘
 
-    cout << "\n";
+    cout << '\n';
 }
 
 // ────── logic ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
@@ -72,12 +68,12 @@ int getcount(path& target)
 void recurse(path& target, string depth)
 {
     int i = 1, count = getcount(target);
+    string pfx, indent;
     error_code err;
 
     for (auto& entry : directory_iterator(target, err))
     {
         path epath = entry.path();
-        string pfx, indent;
 
         if (i == count)
         {
@@ -92,7 +88,7 @@ void recurse(path& target, string depth)
 
         i++;
 
-        cout << depth << pfx << epath.filename().string() << "\n";
+        cout << depth << pfx << epath.filename().string() << '\n';
 
         if (is_directory(epath, err) && !is_symlink(entry.symlink_status())) recurse(epath, depth + indent);
     }
