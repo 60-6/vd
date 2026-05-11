@@ -1,9 +1,9 @@
-// ────── setup ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+// ────── setup ──────────────────────────────────────────────────────────────────────────────────────────┐
 
-//#include <windows.h>
-void windowsnonsense() {
-//SetConsoleOutputCP(65001);SetConsoleMode(GetStdHandle(-11),7);
-}
+#ifdef _WIN32
+#include <windows.h>
+int windows_nonsense = (SetConsoleOutputCP(65001), SetConsoleMode(GetStdHandle(-11), 7));
+#endif
 
 #include <iostream>
 #include <filesystem>
@@ -15,83 +15,43 @@ using namespace std::filesystem;
 #define red     "\e[31m"
 #define reset   "\e[m"
 
-int getcount(path&);
-void recurse(path&, string = "");
+void recurse(path, string = "");
 
-// ────── main ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+// ────── main ───────────────────────────────────────────────────────────────────────────────────────────┤
 
 int main(int, char** argv)
 {
     cout << '\n';
-    windowsnonsense();
 
-// ┌───── validation ────────────────────────────────────────────────────────────────┐
-
-    if (!argv[1])
-    {
-        cout << red << "⚠ you didn't specify a directory\n\n" << reset;
-        return 1;
-    }
+    if (!argv[1] || !is_directory(argv[1])) return cout << red << "⚠ invalid directory\n\n" << reset, 1;
 
     path target = argv[1];
 
-    if (!is_directory(target))
-    {
-        cout << red << "⚠ invalid directory\n\n" << reset;
-        return 1;
-    }
-
-// ├───── header ────────────────────────────────────────────────────────────────────┤
-
-    cout << bold << target.string() << " (" << getcount(target) << ")\n" << reset;
-
-// ├───── recursion ─────────────────────────────────────────────────────────────────┤
-
+    cout << bold << target.string() << '\n' << reset;
     recurse(target);
-
-// └─────────────────────────────────────────────────────────────────────────────────┘
 
     cout << '\n';
 }
 
-// ────── logic ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+// ────── recursion ──────────────────────────────────────────────────────────────────────────────────────┤
 
-int getcount(path& target)
+void recurse(path target, string depth)
 {
-    int count = 0;
     error_code err;
+    directory_iterator it(target, err), last;
 
-    for (auto& entry : directory_iterator(target, err)) count++;
-    return count;
-}
-
-void recurse(path& target, string depth)
-{
-    int i = 1, count = getcount(target);
-    string pfx, indent;
-    error_code err;
-
-    for (auto& entry : directory_iterator(target, err))
+    while (it != last)
     {
-        path epath = entry.path();
+        directory_entry entry = *it++;
+        bool end = (it == last);
 
-        if (i == count)
-        {
-            pfx = "└─ ";
-            indent = "   ";
-        }
-        else
-        {
-            pfx = "├─ ";
-            indent = "│  ";
-        }
+        string pfx = end ? "└─ " : "├─ ";
+        string ind = end ? "   " : "│  ";
 
-        i++;
+        cout << depth << pfx << entry.path().filename().string() << '\n';
 
-        cout << depth << pfx << epath.filename().string() << '\n';
-
-        if (is_directory(epath, err) && !is_symlink(entry.symlink_status())) recurse(epath, depth + indent);
+        if (is_directory(entry, err) && !entry.is_symlink()) recurse(entry, depth + ind);
     }
 }
 
-// ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+// ───────────────────────────────────────────────────────────────────────────────────────────────────────┘
