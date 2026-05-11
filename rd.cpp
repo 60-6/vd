@@ -1,5 +1,10 @@
 // ────── setup ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 
+//#include <windows.h>
+void windowsnonsense() {
+//SetConsoleOutputCP(65001);SetConsoleMode(GetStdHandle(-11),7);
+}
+
 #include <iostream>
 #include <filesystem>
 
@@ -12,11 +17,6 @@ using namespace std::filesystem;
 
 int getcount(path&);
 void recurse(path&, string = "");
-
-//#include <windows.h>
-void windowsnonsense() {
-//SetConsoleOutputCP(65001);SetConsoleMode(GetStdHandle(-11),7);
-}
 
 // ────── main ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
 
